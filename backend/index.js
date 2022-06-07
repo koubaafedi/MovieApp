@@ -2,7 +2,7 @@ import app from './server.js'; // import app that we have previously created and
 import mongodb from "mongodb"; // import mongodb to access our database
 import dotenv from "dotenv"; // dotenv to access our environment variables.
 import MoviesDAO from './dao/moviesDAO.js'; // import and get the reference to the moviesDAO file.
-
+import ReviewsDAO from './dao/reviewsDAO.js';//import and get the reference to the reviewsDAO file.
 // asynchronous function main() to connect to our MongoDB cluster
 // and call functions that access our database
 async function main() {
@@ -25,6 +25,7 @@ async function main() {
         //right after connecting to the database and just before we start the server,
         // we call injectDB to get our initial reference to the movies collection in the database
         await MoviesDAO.injectDB(client);
+        await ReviewsDAO.injectDB(client);
         // app.listen starts the server and listens via the specified port
         app.listen(port, () => {
             // The callback function provided in the 2nd argument is executed
