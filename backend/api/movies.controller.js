@@ -37,4 +37,35 @@ export default class MoviesController {
         //send a JSON response with the above response object to whoever calls this URL.
         res.json(response);
     }
+
+    static async apiGetMovieById(req, res, next) {
+        try {
+            //first look for an id parameter which is the value after the ‘/’ in a URL.
+            // E.g. locahost:5000/api/v1/movies/id/12345
+            //Note the difference between a request query and parameter.
+            // In a query, there is a ‘?’ after the URL followed by a key-value e.g. /api/v1/movies?title=dragon
+            // In a parameter, it’s the value after ‘/’.
+            let id = req.params.id || {};
+            let movie = await MoviesDAO.getMovieById(id);
+            if (!movie) {
+                //If there is no movie, we return an error.
+                res.status(404).json({error: "not found"});
+                return;
+            }
+            res.json(movie);//returns us the specific movie in a JSON response
+        } catch (e) {
+            console.log(`api, ${e}`);
+            res.status(500).json({error: e});
+        }
+    }
+
+    static async apiGetRatings(req, res, next) {
+        try {
+            let propertyTypes = await MoviesDAO.getRatings();
+            res.json(propertyTypes);
+        } catch (e) {
+            console.log(`api,${e}`);
+            res.status(500).json({error: e});
+        }
+    }
 }

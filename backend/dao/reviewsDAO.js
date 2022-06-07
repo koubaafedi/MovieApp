@@ -3,9 +3,9 @@ import mongodb from "mongodb"; //import mongodb to get access to ObjectId
 const ObjectId = mongodb.ObjectId;//We need ObjectId to convert an id string to a MongoDB Object id
 let reviews;
 export default class ReviewsDAO {
-    //if the reviews collection doesn ’ t yet exist in the database,
-    // MongoDB automatically creates it for us.
     static async injectDB(conn) {
+        //if the reviews collection doesn ’ t yet exist in the database,
+        // MongoDB automatically creates it for us.
         if (reviews) {
             return;
         }

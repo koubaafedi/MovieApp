@@ -1,6 +1,8 @@
-// the movies data access object to allow our code to
-// access movie(s) in our database
+// the movies data access object to allow our code to access movie(s) in our database
 
+import mongodb from "mongodb"
+
+const ObjectId = mongodb.ObjectID;
 
 let movies; // movies stores the reference to the database
 //export the class MoviesDAO which contains an async method injectDB
@@ -64,6 +66,46 @@ export default class MoviesDAO {
             // If there is any error, we just return an empty moviesList and totalNumMovies to be 0.
             console.error(`Unable to issue find command, ${e}`);
             return {moviesList: [], totalNumMovies: 0};
+        }
+    }
+
+    static async getRatings() {
+        let ratings = [];
+        try {
+            ratings = await movies.distinct("rated");//get all the distinct rated values from the movies collection.
+            return ratings;
+        } catch (e) {
+            console.error(`unable to get ratings, $(e)`);
+            return ratings;
+        }
+    }
+
+    static async getMovieById(id) {
+        //other than getting the specific movie from the movies collection,
+        // we will also be getting its related reviews from the reviews collection.
+        try {
+            return await movies.aggregate([
+                {$match: {_id: new ObjectId(id),}},// we look for the movie document that matches the specified id.
+                {   //$lookup operator to perform an equality join using the _id field from the movie document
+                    // with the movie_id field from reviews collection.
+                    //      $lookup:{
+                    //          from: <collection to join>,
+                    //          localField: <field from the input document>,
+                    //          foreignField: <field from the documents of the "from" collection>,
+                    //          as: <output array field>
+                    //      }
+                    $lookup: {
+                        from: 'reviews',
+                        localField: '_id',
+                        foreignField: 'movie_id',
+                        as: 'reviews',
+                    }//This finds all the reviews with the specific movie id and returns the specific
+                     //movie together with the reviews in an array.
+                }
+            ]).next();
+        } catch (e) {
+            console.error(`something went wrong in getMovieById: ${e}`);
+            throw e;
         }
     }
 }
